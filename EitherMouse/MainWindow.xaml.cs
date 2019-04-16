@@ -20,9 +20,29 @@ namespace EitherMouse
     /// </summary>
     public partial class MainWindow : Window
     {
+        List<string> devices = new List<string>();
+
         public MainWindow()
         {
             InitializeComponent();
+            loadDevices();
+        }
+
+        void loadDevices()
+        {
+            int i = 0;
+            foreach (string device in devices)
+            {
+                deviceSelection.Items.Add(new ComboBoxItem() { Content = devices[0] });
+                i++;
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            devices.Add(deviceName.Text.ToString());
+
+            loadDevices();
         }
     }
 }
