@@ -42,7 +42,7 @@ namespace EitherMouse
             _notifyIcon = null;
         }
 
-        public static Point GetMousePositionWindowsForms()
+        Point getMousePositionWindowsForms()
         {
             System.Drawing.Point point = System.Windows.Forms.Control.MousePosition;
             return new Point(point.X, point.Y);
@@ -51,8 +51,8 @@ namespace EitherMouse
 
         private void ShowMainWindow()
         {
-            MainWindow.Top = GetMousePositionWindowsForms().Y - 400;
-            MainWindow.Left = GetMousePositionWindowsForms().X - 200;
+            MainWindow.Top = getMousePositionWindowsForms().Y - MainWindow.Height;
+            MainWindow.Left = getMousePositionWindowsForms().X - MainWindow.Width;
             MainWindow.Show();
         }
 
