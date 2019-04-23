@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Newtonsoft;
 
 namespace EitherMouse
 {
@@ -30,6 +32,8 @@ namespace EitherMouse
         }*/
 
         List<Device> devices = new List<Device>();
+
+        FileManager fileManager = new FileManager();
 
         Device curDevice = new Device();
 
@@ -51,13 +55,15 @@ namespace EitherMouse
         public MainWindow()
         {
             InitializeComponent();
+            devices = fileManager.LoadProfiles();
             loadDevices();
         }
 
         void loadDevices()
         {
-            if (devices.Count == 0)
+            if (devices == null || devices.Count == 0)
             {
+                devices = new List<Device>();
                 devices.Add(new Device());
             }
 
@@ -165,7 +171,7 @@ namespace EitherMouse
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-
+            fileManager.SaveProfiles(devices);
         }
     }
 }
