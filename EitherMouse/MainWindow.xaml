@@ -11,23 +11,23 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Label Margin="0,0,116,341" VerticalContentAlignment="Center" Padding="5 0 0 0">Select divice:</Label>
-        <ComboBox x:Name="deviceSelection" Margin="78,0,0,341" VerticalContentAlignment="Center" Padding="0">
+        <ComboBox x:Name="deviceSelection" SelectionChanged="selectDevice" Margin="78,0,0,341" VerticalContentAlignment="Center" Padding="0">
 
         </ComboBox>
 
         <Label Margin="0,45,145,296" VerticalContentAlignment="Center" Padding="5 0 0 0">Name:</Label>
         <TextBox x:Name="deviceName" Margin="49,45,51,296" VerticalContentAlignment="Center" Padding="0"/>
-        <Button Margin="148,45,0,296" Click="Button_Click" VerticalContentAlignment="Center" Padding="0">Add</Button>
+        <Button Margin="148,45,0,296" Click="Add_Click" VerticalContentAlignment="Center" Padding="0">Add</Button>
 
         <Label Margin="0,110,0,231" VerticalContentAlignment="Center" Padding="5 0 0 0">Sensitivity</Label>
-        <Slider x:Name="sensitivityInput" Margin="0,140,0,201" Minimum="1" Maximum="20" IsSnapToTickEnabled="True" TickFrequency="1"></Slider>
+        <Slider x:Name="sensitivityInput" Value="10" ValueChanged="SetDevice_Click" Margin="0,140,0,201" Minimum="1" Maximum="20" IsSnapToTickEnabled="True" TickFrequency="1"></Slider>
 
         <Label Margin="0,175,0,166" VerticalContentAlignment="Center" Padding="5 0 0 0">Doubleclick Speed</Label>
-        <Slider x:Name="doubleClickSpeedInput" Margin="0,205,0,136" Minimum="1" Maximum="5000" IsSnapToTickEnabled="True" TickFrequency="1"></Slider>
+        <Slider x:Name="doubleClickSpeedInput" Value="500" ValueChanged="SetDevice_Click" Margin="0,205,0,136" Minimum="1" Maximum="5000" IsSnapToTickEnabled="True" TickFrequency="1"></Slider>
 
         <Label Margin="0,240,0,101" VerticalContentAlignment="Center" Padding="5 0 0 0">Scroll Speed</Label>
-        <Slider x:Name="scrollSpeedInput" Margin="0,270,0,71" Minimum="1" Maximum="100" IsSnapToTickEnabled="True" TickFrequency="1"></Slider>
+        <Slider x:Name="scrollSpeedInput" Value="3" ValueChanged="SetDevice_Click" Margin="0,270,0,71" Minimum="1" Maximum="100" IsSnapToTickEnabled="True" TickFrequency="1"></Slider>
 
-        <Button Margin="0,331,0,10" Click="SetDevice_Click">Set</Button>
+        <Button Margin="0,331,0,10" Click="Save_Click">Save</Button>
     </Grid>
 </Window>

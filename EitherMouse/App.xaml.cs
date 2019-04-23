@@ -19,7 +19,7 @@ namespace EitherMouse
             MainWindow.Closing += MainWindow_Closing;
 
             _notifyIcon = new System.Windows.Forms.NotifyIcon();
-            _notifyIcon.MouseClick += (s, args) => ShowMainWindow();
+            _notifyIcon.MouseDown += (s, args) => ShowMainWindow();
             _notifyIcon.Icon = EitherMouse.Properties.Resources.Icon1;
             _notifyIcon.Visible = true;
 

@@ -20,5 +20,21 @@ namespace EitherMouse
             this.DoubleClickSpeed = doubleClickSpeed;
             this.ScrollSpeed = scrollSpeed;
         }
+
+        public Device()
+        {
+            this.Name = "Default";
+            this.Sensitivity = 10;
+            this.DoubleClickSpeed = 500;
+            this.ScrollSpeed = 3;
+        }
+
+        public Device(string name)
+        {
+            this.Name = name;
+            this.Sensitivity = 10;
+            this.DoubleClickSpeed = 500;
+            this.ScrollSpeed = 3;
+        }
     }
 }

@@ -31,6 +31,8 @@ namespace EitherMouse
 
         List<Device> devices = new List<Device>();
 
+        Device curDevice = new Device();
+
         public const UInt32 spi_setMouseSpeed = 0x0071;
         public const UInt32 spi_setMouseDoubleclickSpeed = 0x0020;
         public const UInt32 spi_setMouseScrollSpeed = 0x0069;
@@ -54,68 +56,116 @@ namespace EitherMouse
 
         void loadDevices()
         {
-            int i = 0;
+            if (devices.Count == 0)
+            {
+                devices.Add(new Device());
+            }
+
+            deviceSelection.Items.Clear();
+
             foreach (Device device in devices)
             {
-                deviceSelection.Items.Add(new ComboBoxItem() { Content = devices[0].Name });
-                i++;
+                deviceSelection.Items.Add(new ComboBoxItem() { Content = device.Name });
             }
+
+            deviceSelection.SelectedIndex = devices.Count - 1;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Add_Click(object sender, RoutedEventArgs e)
         {
-            UInt32 curSensitivity = 0;
-            SystemParametersInfo(spi_getMouseSpeed, 0, curSensitivity, 0);
-
-            UInt32 curScrollSpeed = 0;
-            SystemParametersInfo(spi_getMouseScrollSpeed, 0, curScrollSpeed, 0);
-
-            Device newDevice = new Device(deviceName.Text.ToString(), curSensitivity, 500, spi_getMouseScrollSpeed);
+            Device newDevice = new Device(deviceName.Text.ToString(), Convert.ToUInt32(sensitivityInput.Value), Convert.ToUInt32(doubleClickSpeedInput.Value), Convert.ToUInt32(scrollSpeedInput.Value));
 
             devices.Add(newDevice);
+            curDevice = newDevice;
+
+            sensitivityInput.Value = curDevice.Sensitivity;
+            scrollSpeedInput.Value = curDevice.ScrollSpeed;
+            doubleClickSpeedInput.Value = curDevice.DoubleClickSpeed;
 
             loadDevices();
+
+            deviceName.Text = "";
         }
 
-        private void SetDevice_Click(object sender, RoutedEventArgs e)
+        void setDevice()
         {
             if (deviceSelection.SelectedIndex != -1)
             {
-                Device curDevice = devices[deviceSelection.SelectedIndex];
+                curDevice = devices[deviceSelection.SelectedIndex];
 
+                devices[deviceSelection.SelectedIndex] = curDevice;
+
+                loadDevice(curDevice);
+            }
+        }
+
+        void updateDevice()
+        {
+            if (sensitivityInput != null && doubleClickSpeedInput != null && scrollSpeedInput != null)
+            {
                 curDevice.Sensitivity = UInt32.Parse(sensitivityInput.Value.ToString());
                 curDevice.DoubleClickSpeed = UInt32.Parse(doubleClickSpeedInput.Value.ToString());
                 curDevice.ScrollSpeed = UInt32.Parse(scrollSpeedInput.Value.ToString());
 
-                SystemParametersInfo(
+                if (deviceSelection.SelectedIndex != -1)
+                {
+                    devices[deviceSelection.SelectedIndex] = curDevice;
 
-                    spi_setMouseSpeed,
-                    0,
-                    curDevice.Sensitivity,
-                    0
-
-                    );
-                SystemParametersInfo(
-
-                    spi_setMouseDoubleclickSpeed,
-                    curDevice.ScrollSpeed,
-                    0,
-                    0
-
-                    );
-                SystemParametersInfo(
-
-                    spi_setMouseScrollSpeed,
-                    curDevice.ScrollSpeed,
-                    0,
-                    0
-
-                    );
+                    loadDevice(curDevice);
+                }
             }
-            else
+        }
+
+        private void SetDevice_Click(object sender, RoutedEventArgs e)
+        {
+            updateDevice();
+        }
+
+        void loadDevice(Device curDevice)
+        {
+            SystemParametersInfo(
+
+                spi_setMouseSpeed,
+                0,
+                curDevice.Sensitivity,
+                0
+
+                );
+            SystemParametersInfo(
+
+                spi_setMouseDoubleclickSpeed,
+                curDevice.DoubleClickSpeed,
+                0,
+                0
+
+                );
+            SystemParametersInfo(
+
+                spi_setMouseScrollSpeed,
+                curDevice.ScrollSpeed,
+                0,
+                0
+
+                );
+        }
+
+        private void selectDevice(object sender, SelectionChangedEventArgs e)
+        {
+            if (deviceSelection.SelectedIndex != -1)
             {
-                MessageBox.Show("At first select device");
+                curDevice = devices[deviceSelection.SelectedIndex];
+
+                sensitivityInput.Value = curDevice.Sensitivity;
+                doubleClickSpeedInput.Value = curDevice.DoubleClickSpeed;
+                scrollSpeedInput.Value = curDevice.ScrollSpeed;
+
+                setDevice();
             }
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
