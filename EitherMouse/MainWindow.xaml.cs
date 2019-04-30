@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Newtonsoft;
+using Newtonsoft.Json;
 
 namespace EitherMouse
 {
@@ -23,14 +25,6 @@ namespace EitherMouse
     /// </summary>
     public partial class MainWindow : Window
     {
-        /*Device(string name, int sensitivity, int doubleClickSpeed, int scrollSpeed)
-        {
-            this.Name = name;
-            this.Sensitivity = sensitivity;
-            this.DoubleClickSpeed = doubleClickSpeed;
-            this.ScrollSpeed = scrollSpeed;
-        }*/
-
         List<Device> devices = new List<Device>();
 
         FileManager fileManager = new FileManager();
@@ -57,6 +51,8 @@ namespace EitherMouse
             InitializeComponent();
             devices = fileManager.LoadProfiles();
             loadDevices();
+
+            GET_AllDevices();
         }
 
         void loadDevices()
@@ -172,6 +168,49 @@ namespace EitherMouse
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             fileManager.SaveProfiles(devices);
+        }
+
+        async void synchronizeDevices(List<Device> localDevices)
+        {
+            List<Device> devicesFromDb = await GET_AllDevices();
+
+            foreach(Device device in localDevices)
+            {
+                if (device.Id == -1)
+                {
+                    
+                }
+            }
+        }
+
+        public async Task<List<Device>> GET_AllDevices()
+        {
+            HttpClient httpClient = new HttpClient();
+
+            HttpResponseMessage response = await httpClient.GetAsync("https://voskoto16.sps-prosek.cz/Api/selectAllDevices.php");
+
+            string jsonContent = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<List<Device>>(jsonContent);
+        }
+
+        public async Task<HttpResponseMessage> POST_Device(Device device)
+        {
+            HttpClient client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://voskoto16.sps-prosek.cz/Api/insertDevice.php");
+
+            List<KeyValuePair<string, string>> keyValues = new List<KeyValuePair<string, string>>();
+
+            keyValues.Add(new KeyValuePair<string, string>("Name", device.Name));
+            keyValues.Add(new KeyValuePair<string, string>("Sensitivity", device.Sensitivity.ToString()));
+            keyValues.Add(new KeyValuePair<string, string>("DoubleClickSpeed", device.DoubleClickSpeed.ToString()));
+            keyValues.Add(new KeyValuePair<string, string>("ScrollSpeed", device.ScrollSpeed.ToString()));
+
+            request.Content = new FormUrlEncodedContent(keyValues);
+
+            HttpResponseMessage responseMessage = await client.SendAsync(request);
+
+            return responseMessage;
         }
     }
 }
