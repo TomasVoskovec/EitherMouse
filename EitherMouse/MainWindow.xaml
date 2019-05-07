@@ -28,6 +28,7 @@
         <Label Margin="0,240,0,101" VerticalContentAlignment="Center" Padding="5 0 0 0">Scroll Speed</Label>
         <Slider x:Name="scrollSpeedInput" Value="3" ValueChanged="SetDevice_Click" Margin="0,270,0,71" Minimum="1" Maximum="100" IsSnapToTickEnabled="True" TickFrequency="1"></Slider>
 
-        <Button Margin="0,331,0,10" Click="Save_Click">Save</Button>
+        <Button Margin="0,331,0,10" Click="Sync_Click">Synchronize</Button>
+        <Button Margin="0,296,0,45" Click="Save_Click" Content="Save"/>
     </Grid>
 </Window>

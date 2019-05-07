@@ -26,6 +26,7 @@ namespace EitherMouse
     public partial class MainWindow : Window
     {
         List<Device> devices = new List<Device>();
+        List<Device> devicesFromDb = new List<Device>();
 
         FileManager fileManager = new FileManager();
 
@@ -51,8 +52,6 @@ namespace EitherMouse
             InitializeComponent();
             devices = fileManager.LoadProfiles();
             loadDevices();
-
-            GET_AllDevices();
         }
 
         void loadDevices()
@@ -87,6 +86,8 @@ namespace EitherMouse
             loadDevices();
 
             deviceName.Text = "";
+
+            fileManager.SaveProfiles(devices);
         }
 
         void setDevice()
@@ -165,20 +166,48 @@ namespace EitherMouse
             }
         }
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private void Sync_Click(object sender, RoutedEventArgs e)
         {
-            fileManager.SaveProfiles(devices);
+            synchronizeDevices(devices);
         }
 
         async void synchronizeDevices(List<Device> localDevices)
         {
-            List<Device> devicesFromDb = await GET_AllDevices();
+            devicesFromDb = await GET_AllDevices();
 
-            foreach(Device device in localDevices)
+            foreach (Device dbDevice in devicesFromDb)
+            {
+                bool deviceExist = false;
+
+                foreach (Device localDevice in devices)
+                {
+                    if (dbDevice.Id == localDevice.Id)
+                    {
+                        deviceExist = true;
+
+                        await POST_UpdateDevice(localDevice);
+                    }
+                }
+
+                if (!deviceExist)
+                {
+                    devices.Add(dbDevice);
+                }
+            }
+
+            loadDevices();
+
+            fileManager.SaveProfiles(devices);
+
+            foreach (Device device in localDevices)
             {
                 if (device.Id == -1)
                 {
-                    
+                    HttpResponseMessage x = await POST_Device(device);
+
+                    string newId = await x.Content.ReadAsStringAsync();
+
+                    device.Id = Convert.ToInt32(newId);
                 }
             }
         }
@@ -201,6 +230,7 @@ namespace EitherMouse
 
             List<KeyValuePair<string, string>> keyValues = new List<KeyValuePair<string, string>>();
 
+            keyValues.Add(new KeyValuePair<string, string>("User", "application"));
             keyValues.Add(new KeyValuePair<string, string>("Name", device.Name));
             keyValues.Add(new KeyValuePair<string, string>("Sensitivity", device.Sensitivity.ToString()));
             keyValues.Add(new KeyValuePair<string, string>("DoubleClickSpeed", device.DoubleClickSpeed.ToString()));
@@ -211,6 +241,32 @@ namespace EitherMouse
             HttpResponseMessage responseMessage = await client.SendAsync(request);
 
             return responseMessage;
+        }
+
+        public async Task<HttpResponseMessage> POST_UpdateDevice(Device device)
+        {
+            HttpClient client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://voskoto16.sps-prosek.cz/Api/insertDevice.php");
+
+            List<KeyValuePair<string, string>> keyValues = new List<KeyValuePair<string, string>>();
+
+            keyValues.Add(new KeyValuePair<string, string>("User", "application"));
+            keyValues.Add(new KeyValuePair<string, string>("Id", device.Id.ToString()));
+            keyValues.Add(new KeyValuePair<string, string>("Name", device.Name));
+            keyValues.Add(new KeyValuePair<string, string>("Sensitivity", device.Sensitivity.ToString()));
+            keyValues.Add(new KeyValuePair<string, string>("DoubleClickSpeed", device.DoubleClickSpeed.ToString()));
+            keyValues.Add(new KeyValuePair<string, string>("ScrollSpeed", device.ScrollSpeed.ToString()));
+
+            request.Content = new FormUrlEncodedContent(keyValues);
+
+            HttpResponseMessage responseMessage = await client.SendAsync(request);
+
+            return responseMessage;
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            fileManager.SaveProfiles(devices);
         }
     }
 }
