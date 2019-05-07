@@ -197,19 +197,19 @@ namespace EitherMouse
 
             loadDevices();
 
-            fileManager.SaveProfiles(devices);
-
-            foreach (Device device in localDevices)
+            for (int i = 0; i < devices.Count; i++)
             {
-                if (device.Id == -1)
+                if (devices[i].Id == -1)
                 {
-                    HttpResponseMessage x = await POST_Device(device);
+                    HttpResponseMessage x = await POST_Device(devices[i]);
 
                     string newId = await x.Content.ReadAsStringAsync();
 
-                    device.Id = Convert.ToInt32(newId);
+                    devices[i].Id = Convert.ToInt32(newId);
                 }
             }
+
+            fileManager.SaveProfiles(devices);
         }
 
         public async Task<List<Device>> GET_AllDevices()
